@@ -2,11 +2,23 @@ package common
 
 import (
 	"slices"
+	"strings"
 )
 
 func Sorted(list []string) []string {
 	slices.Sort(list)
 	return list
+}
+
+func SplitAndTrim(s, sep string) []string {
+	parts := []string{}
+	for part := range strings.SplitSeq(s, sep) {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			parts = append(parts, trimmed)
+		}
+	}
+	return parts
 }
 
 func DifferenceOfOrderedSlices(base, toRemove []string) []string {

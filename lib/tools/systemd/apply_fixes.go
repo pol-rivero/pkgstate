@@ -8,7 +8,7 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common/prompt"
 )
 
-func (l *SystemdTool) ApplyFixes(noConfirm bool) {
+func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
 	sudo := getSudoPrefix(l.SystemScope)
 	scope := getScopeFlag(l.SystemScope)
 	for _, mismatch := range l.UnitMismatches {
@@ -18,7 +18,7 @@ func (l *SystemdTool) ApplyFixes(noConfirm bool) {
 			continue
 		}
 
-		if !noConfirm {
+		if requestConfirmation {
 			response := prompt.RequestInput("yN", "Do you want to %s the unit '%s'?", action, mismatch.UnitName)
 			if response != 'y' {
 				log.Info("Skipping update of unit '%s'", mismatch.UnitName)

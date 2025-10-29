@@ -15,6 +15,7 @@ func Fix(noConfirm bool) {
 		if err != nil {
 			log.Fatal("Failed to %s: %v", tool.FriendlyProcessName(), err)
 		}
-		tool.ApplyFixes(noConfirm)
+		requestConfirmation := !noConfirm
+		tool.ApplyFixes(requestConfirmation)
 	}
 }

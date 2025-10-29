@@ -1,5 +1,5 @@
 package packages
 
-func (l *PackagesTool) ApplyFixes(noConfirm bool) {
+func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 	// TODO
 }
