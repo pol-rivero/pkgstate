@@ -7,10 +7,10 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common/config"
 )
 
-func (l *PackagesTool) GatherData(*config.Config) error {
+func (l *PackagesTool) GatherData(config *config.Config) error {
+	l.DesiredPackages = common.Sorted(config.Packages)
 	packageManager := l.getPackageManager()
 
-	// TODO: parallelize data gathering
 	allPackages, err := packageManager.GetAllInstalledPackages()
 	if err != nil {
 		return fmt.Errorf("error getting all installed packages: %v", err)

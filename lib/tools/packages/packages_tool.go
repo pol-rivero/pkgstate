@@ -6,8 +6,17 @@ import (
 
 type PackagesTool struct {
 	PackageManagerCache         pm.PackageManager
+	DesiredPackages             []string
 	AllInstalledPackages        []string
 	ExplicitlyInstalledPackages []string
+}
+
+func NewPackagesTool() *PackagesTool {
+	return &PackagesTool{}
+}
+
+func (l *PackagesTool) FriendlyProcessName() string {
+	return "get installed packages"
 }
 
 func (l *PackagesTool) getPackageManager() pm.PackageManager {
