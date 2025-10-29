@@ -3,15 +3,15 @@ package config
 import (
 	"os"
 
-	"github.com/pelletier/go-toml/v2"
 	"github.com/pol-rivero/pkgstate/lib/common/log"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Packages    []string          `toml:"packages"`
-	UserGroups  []string          `toml:"user_groups"`
-	SystemUnits map[string]string `toml:"systemd_system"`
-	UserUnits   map[string]string `toml:"systemd_user"`
+	Packages    []string          `yaml:"packages"`
+	UserGroups  []string          `yaml:"groups"`
+	SystemUnits map[string]string `yaml:"systemd"`
+	UserUnits   map[string]string `yaml:"systemd_user"`
 }
 
 func defaultConfig() Config {
@@ -29,7 +29,7 @@ func fromFile(path string) Config {
 	if err != nil {
 		log.Fatal("Error reading config file (%s): %v", path, err)
 	}
-	err = toml.Unmarshal(fileContents, &config)
+	err = yaml.Unmarshal(fileContents, &config)
 	if err != nil {
 		log.Fatal("Error parsing config file (%s): %v", path, err)
 	}

@@ -20,7 +20,7 @@ func fromDir(dir string) Config {
 		log.Fatal("Error reading config directory (%s): %v", dir, err)
 	}
 	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".toml") {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
 			continue
 		}
 		fullName := dir + "/" + entry.Name()
