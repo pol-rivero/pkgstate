@@ -1,6 +1,8 @@
 package groups
 
 import (
+	"os/user"
+
 	"github.com/pol-rivero/pkgstate/lib/common"
 	"github.com/pol-rivero/pkgstate/lib/common/config"
 )
@@ -18,11 +20,11 @@ func (l *GroupsTool) GatherData(config *config.Config) error {
 	}
 	l.MissingGroups = missingGroups
 
-	userName, err := common.RunCommand("whoami")
+	currentUser, err := user.Current()
 	if err != nil {
 		return err
 	}
-	l.UserName = userName
+	l.UserName = currentUser.Username
 	return nil
 }
 

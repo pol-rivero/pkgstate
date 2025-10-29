@@ -21,12 +21,9 @@ func (l *GroupsTool) ApplyFixes(requestConfirmation bool) {
 }
 
 func createUserGroup(groupName string, requestConfirmation bool) bool {
-	if requestConfirmation {
-		response := prompt.RequestInput("yN", "Do you want to create the missing group '%s'?", groupName)
-		if response != 'y' {
-			log.Info("Skipping group '%s'", groupName)
-			return false
-		}
+	if requestConfirmation && prompt.RequestInput("yN", "Do you want to create the missing group '%s'?", groupName) != 'y' {
+		log.Info("Skipping group '%s'", groupName)
+		return false
 	}
 	_, err := common.RunCommand("sudo", "groupadd", groupName)
 	if err != nil {
@@ -37,12 +34,9 @@ func createUserGroup(groupName string, requestConfirmation bool) bool {
 }
 
 func addUserToGroup(userName, groupName string, requestConfirmation bool) bool {
-	if requestConfirmation {
-		response := prompt.RequestInput("yN", "Do you want to add the user '%s' to the group '%s'?", userName, groupName)
-		if response != 'y' {
-			log.Info("Skipping group '%s'", groupName)
-			return false
-		}
+	if requestConfirmation && prompt.RequestInput("yN", "Do you want to add the user '%s' to the group '%s'?", userName, groupName) != 'y' {
+		log.Info("Skipping group '%s'", groupName)
+		return false
 	}
 	_, err := common.RunCommand("sudo", "usermod", "-aG", groupName, userName)
 	if err != nil {

@@ -41,3 +41,20 @@ func DifferenceOfOrderedSlices(base, toRemove []string) []string {
 	}
 	return result
 }
+
+func IntersectionOfOrderedSlices(slice1, slice2 []string) []string {
+	result := []string{}
+	i, j := 0, 0
+	for i < len(slice1) && j < len(slice2) {
+		if slice1[i] < slice2[j] {
+			i++
+		} else if slice1[i] > slice2[j] {
+			j++
+		} else {
+			result = append(result, slice1[i])
+			i++
+			j++
+		}
+	}
+	return result
+}

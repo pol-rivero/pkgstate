@@ -27,3 +27,8 @@ func RunCommandGetLines(commandAndArgs ...string) ([]string, error) {
 	lines := strings.Split(output, "\n")
 	return lines, nil
 }
+
+func IsCommandAvailable(commandName string) bool {
+	_, err := exec.LookPath(commandName)
+	return err == nil
+}
