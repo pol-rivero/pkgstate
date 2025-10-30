@@ -25,7 +25,7 @@ func createUserGroup(groupName string, requestConfirmation bool) bool {
 		log.Info("Skipping group '%s'", groupName)
 		return false
 	}
-	_, err := common.RunCommand(false, "sudo", "groupadd", groupName)
+	err := common.RunCommand("sudo", "groupadd", groupName)
 	if err != nil {
 		log.Error("Failed to create group '%s': %v", groupName, err)
 		return false
@@ -38,7 +38,7 @@ func addUserToGroup(userName, groupName string, requestConfirmation bool) bool {
 		log.Info("Skipping group '%s'", groupName)
 		return false
 	}
-	_, err := common.RunCommand(false, "sudo", "usermod", "-aG", groupName, userName)
+	err := common.RunCommand("sudo", "usermod", "-aG", groupName, userName)
 	if err != nil {
 		log.Error("Failed to add user '%s' to group '%s': %v", userName, groupName, err)
 		return false

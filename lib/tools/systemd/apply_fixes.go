@@ -27,7 +27,7 @@ func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
 		}
 
 		commandAndArgs := append(sudo, "systemctl", scope, action, "--now", string(mismatch.UnitName))
-		_, err = common.RunCommand(true, commandAndArgs...)
+		err = common.RunCommand(commandAndArgs...)
 		if err != nil {
 			log.Error("Failed to update unit '%s': %v", mismatch.UnitName, err)
 			continue
