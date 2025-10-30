@@ -40,7 +40,7 @@ func toMissingGroups(groupNames []string) ([]MissingGroup, error) {
 }
 
 func getUserGroups() ([]string, error) {
-	output, err := common.RunCommand("groups")
+	output, err := common.RunCommand(false, "groups")
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +49,6 @@ func getUserGroups() ([]string, error) {
 }
 
 func userGroupExists(groupName string) bool {
-	_, err := common.RunCommand("getent", "group", groupName)
+	_, err := common.RunCommand(false, "getent", "group", groupName)
 	return err == nil
 }

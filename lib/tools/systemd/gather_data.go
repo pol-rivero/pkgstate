@@ -19,7 +19,7 @@ func (l *SystemdTool) GatherData(config *config.Config) error {
 }
 
 func getCurrentUnits(systemScope bool) (SystemdUnitCollection, error) {
-	jsonOutput, err := common.RunCommand("systemctl", getScopeFlag(systemScope), "list-unit-files", "--all", "--no-pager", "--output=json")
+	jsonOutput, err := common.RunCommand(false, "systemctl", getScopeFlag(systemScope), "list-unit-files", "--all", "--no-pager", "--output=json")
 	if err != nil {
 		return nil, err
 	}

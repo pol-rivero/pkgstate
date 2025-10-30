@@ -19,7 +19,7 @@ func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
 		}
 
 		if requestConfirmation {
-			response := prompt.RequestInput("yN", "Do you want to %s the unit '%s'?", action, mismatch.UnitName)
+			response := prompt.RequestInput("Yn", "Do you want to %s the unit '%s'?", action, mismatch.UnitName)
 			if response != 'y' {
 				log.Info("Skipping update of unit '%s'", mismatch.UnitName)
 				continue
@@ -27,7 +27,7 @@ func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
 		}
 
 		commandAndArgs := append(sudo, "systemctl", scope, action, "--now", string(mismatch.UnitName))
-		_, err = common.RunCommand(commandAndArgs...)
+		_, err = common.RunCommand(true, commandAndArgs...)
 		if err != nil {
 			log.Error("Failed to update unit '%s': %v", mismatch.UnitName, err)
 			continue

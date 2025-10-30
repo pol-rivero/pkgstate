@@ -9,27 +9,27 @@ func (p *Pacman) GetBinaryName() string {
 }
 
 func (p *Pacman) GetAllInstalledPackages() ([]string, error) {
-	return common.RunCommandGetLines("pacman", "-Qq")
+	return common.RunCommandGetLines(false, "pacman", "-Qq")
 }
 
 func (p *Pacman) GetExplicitlyInstalledPackages() ([]string, error) {
-	return common.RunCommandGetLines("pacman", "-Qqe")
+	return common.RunCommandGetLines(false, "pacman", "-Qqe")
 }
 
 func (y *Pacman) RemovePackages(packages []string) error {
-	args := append([]string{"sudo", "pacman", "-Rs"}, packages...)
-	_, err := common.RunCommandGetLines(args...)
+	args := append([]string{"sudo", "pacman", "-Rs", "--noconfirm"}, packages...)
+	_, err := common.RunCommandGetLines(true, args...)
 	return err
 }
 
 func (y *Pacman) MarkPackagesAsExplicitlyInstalled(packages []string) error {
 	args := append([]string{"sudo", "pacman", "-D", "--asexplicit"}, packages...)
-	_, err := common.RunCommandGetLines(args...)
+	_, err := common.RunCommandGetLines(true, args...)
 	return err
 }
 
 func (y *Pacman) InstallPackages(packages []string) error {
-	args := append([]string{"sudo", "pacman", "-S"}, packages...)
-	_, err := common.RunCommandGetLines(args...)
+	args := append([]string{"sudo", "pacman", "-S", "--ask", "4"}, packages...)
+	_, err := common.RunCommandGetLines(true, args...)
 	return err
 }

@@ -29,7 +29,7 @@ func (y *Yay) MarkPackagesAsExplicitlyInstalled(packages []string) error {
 }
 
 func (y *Yay) InstallPackages(packages []string) error {
-	args := append([]string{"yay", "-S"}, packages...)
-	_, err := common.RunCommandGetLines(args...)
+	args := append([]string{"yay", "-S", "--ask", "4"}, packages...)
+	_, err := common.RunCommandGetLines(true, args...)
 	return err
 }

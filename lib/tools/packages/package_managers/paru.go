@@ -29,7 +29,7 @@ func (y *Paru) MarkPackagesAsExplicitlyInstalled(packages []string) error {
 }
 
 func (y *Paru) InstallPackages(packages []string) error {
-	args := append([]string{"paru", "-S"}, packages...)
-	_, err := common.RunCommandGetLines(args...)
+	args := append([]string{"paru", "-S", "--ask", "4"}, packages...)
+	_, err := common.RunCommandGetLines(true, args...)
 	return err
 }

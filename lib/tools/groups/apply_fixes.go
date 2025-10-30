@@ -21,11 +21,11 @@ func (l *GroupsTool) ApplyFixes(requestConfirmation bool) {
 }
 
 func createUserGroup(groupName string, requestConfirmation bool) bool {
-	if requestConfirmation && prompt.RequestInput("yN", "Do you want to create the missing group '%s'?", groupName) != 'y' {
+	if requestConfirmation && prompt.RequestInput("Yn", "Do you want to create the missing group '%s'?", groupName) == 'n' {
 		log.Info("Skipping group '%s'", groupName)
 		return false
 	}
-	_, err := common.RunCommand("sudo", "groupadd", groupName)
+	_, err := common.RunCommand(false, "sudo", "groupadd", groupName)
 	if err != nil {
 		log.Error("Failed to create group '%s': %v", groupName, err)
 		return false
@@ -34,11 +34,11 @@ func createUserGroup(groupName string, requestConfirmation bool) bool {
 }
 
 func addUserToGroup(userName, groupName string, requestConfirmation bool) bool {
-	if requestConfirmation && prompt.RequestInput("yN", "Do you want to add the user '%s' to the group '%s'?", userName, groupName) != 'y' {
+	if requestConfirmation && prompt.RequestInput("Yn", "Do you want to add the user '%s' to the group '%s'?", userName, groupName) == 'n' {
 		log.Info("Skipping group '%s'", groupName)
 		return false
 	}
-	_, err := common.RunCommand("sudo", "usermod", "-aG", groupName, userName)
+	_, err := common.RunCommand(false, "sudo", "usermod", "-aG", groupName, userName)
 	if err != nil {
 		log.Error("Failed to add user '%s' to group '%s': %v", userName, groupName, err)
 		return false

@@ -39,7 +39,7 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 
 func ynPrompt(requestConfirmation bool, message string, packages []string) bool {
 	if requestConfirmation {
-		return prompt.RequestInput("yN", message, formatList(packages)) == 'y'
+		return prompt.RequestInput("Yn", message, formatList(packages)) == 'y'
 	}
 	return true
 }
