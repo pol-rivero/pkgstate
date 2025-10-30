@@ -1,8 +1,5 @@
 # pkgstate
 
-> ![WARNING]
-> Work in progress.
-
 Declarative package management for Arch Linux. Define the desired state of installed packages in a set of YAML files, and `pkgstate` will ensure that
 the system matches that state.
 
@@ -12,7 +9,7 @@ is a member of, as some packages need specific group memberships to function pro
 
 ## How to use
 
-1. `pkgstate` is meant to used in a dotfiles repository. If you don't have one yet, I recommend checking out my other project [pkgstate](https://github.com/pol-rivero/pkgstate),
+1. `pkgstate` is meant to used in a dotfiles repository. If you don't have one yet, I recommend checking out my other project [doot](https://github.com/pol-rivero/doot),
     but you can use any dotfiles manager you like.
 
 1. Create a directory for your package definitions. By default, `~/.config/packages/` is used, but you can change this with the `PKGSTATE_DIR` environment variable.

@@ -1,0 +1,135 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - '*'  # Trigger on any tag push
+
+permissions:
+  contents: write   # Create releases
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.determine_version.outputs.VERSION }}
+      RELEASE_TYPE: ${{ steps.determine_version.outputs.RELEASE_TYPE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.0'
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Install Go dependencies
+        run: go mod download
+
+      - name: Determine Version
+        id: determine_version
+        shell: bash
+        run: |
+          TAG_NAME="${{ github.ref_name }}"  # GitHub provides the tag name directly
+          echo "Tag name: $TAG_NAME"
+
+          if [[ "$TAG_NAME" == pre.* ]]; then
+            RELEASE_TYPE="prerelease"
+          else
+            RELEASE_TYPE="release"
+          fi
+
+          echo "VERSION=${TAG_NAME}" >> $GITHUB_ENV
+          echo "VERSION=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "RELEASE_TYPE=${RELEASE_TYPE}" >> $GITHUB_ENV
+          echo "RELEASE_TYPE=${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+
+      - name: Populate version string
+        shell: bash
+        run: |
+          sed -i "s/\[\[VERSION\]\]/${{ env.VERSION }}/g" cmd/version.go
+          sed -i "s/\[\[COMMIT\]\]/${{ github.sha }}/g" cmd/version.go
+
+      - name: Static analysis
+        run: make check
+
+      - name: Build binaries
+        run: make build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "${{ env.VERSION }}"
+          name: "${{ env.RELEASE_TYPE == 'release' && 'Release' || 'Pre-release' }} ${{ env.VERSION }}"
+          prerelease: ${{ env.RELEASE_TYPE != 'release' }}
+          generate_release_notes: true
+          files: |
+            dist/pkgstate-linux-arm64
+            dist/pkgstate-linux-x86_64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tarball checksum
+        run: |
+          TARBALL_CHECKSUM=$(curl -sSL "https://github.com/${{ github.repository }}/archive/refs/tags/${{ env.VERSION }}.tar.gz" | sha256sum | cut -d' ' -f1)
+          echo "TARBALL_CHECKSUM=${TARBALL_CHECKSUM}" >> $GITHUB_ENV
+
+      - name: Generate PKGBUILD files from templates
+        run: .github/generate-pkgbuild.sh ${{ env.VERSION }} ${{ env.TARBALL_CHECKSUM }}
+
+      - name: Upload PKGBUILD Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkgbuilds
+          path: |
+            pkgstate-PKGBUILD
+            pkgstate-git-PKGBUILD
+            pkgstate-bin-PKGBUILD
+
+  publish_aur:
+    needs: build_release
+    runs-on: ubuntu-latest
+    if: ${{ needs.build_release.outputs.RELEASE_TYPE == 'release' }}
+    env:
+      VERSION: ${{ needs.build_release.outputs.VERSION }}
+    steps:
+      - name: Download PKGBUILD Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pkgbuilds
+
+      - name: Publish AUR package (pkgstate)
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.0
+        with:
+          pkgname: pkgstate
+          pkgbuild: ./pkgstate-PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update AUR package to version ${{ env.VERSION }}"
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+
+      - name: Publish AUR package (pkgstate-bin)
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.0
+        with:
+          pkgname: pkgstate-bin
+          pkgbuild: ./pkgstate-bin-PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update AUR package to version ${{ env.VERSION }}"
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+
+      - name: Publish AUR package (pkgstate-git)
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.0
+        with:
+          pkgname: pkgstate-git
+          pkgbuild: ./pkgstate-git-PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update AUR package"
+          ssh_keyscan_types: rsa,ecdsa,ed25519
