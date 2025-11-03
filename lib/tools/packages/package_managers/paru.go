@@ -8,27 +8,27 @@ type Paru struct {
 	Parent Pacman
 }
 
-func (y *Paru) GetBinaryName() string {
+func (p *Paru) GetBinaryName() string {
 	return "paru"
 }
 
-func (y *Paru) GetAllInstalledPackages() ([]string, error) {
-	return y.Parent.GetAllInstalledPackages()
+func (p *Paru) GetAllInstalledPackages() ([]string, error) {
+	return p.Parent.GetAllInstalledPackages()
 }
 
-func (y *Paru) GetExplicitlyInstalledPackages() ([]string, error) {
-	return y.Parent.GetExplicitlyInstalledPackages()
+func (p *Paru) GetExplicitlyInstalledPackages() ([]string, error) {
+	return p.Parent.GetExplicitlyInstalledPackages()
 }
 
-func (y *Paru) RemovePackages(packages []string) error {
-	return y.Parent.RemovePackages(packages)
+func (p *Paru) RemovePackages(packages []string) error {
+	return p.Parent.RemovePackages(packages)
 }
 
-func (y *Paru) MarkPackagesAsExplicitlyInstalled(packages []string) error {
-	return y.Parent.MarkPackagesAsExplicitlyInstalled(packages)
+func (p *Paru) MarkPackagesAsExplicitlyInstalled(packages []string) error {
+	return p.Parent.MarkPackagesAsExplicitlyInstalled(packages)
 }
 
-func (y *Paru) InstallPackages(packages []string) error {
+func (p *Paru) InstallPackages(packages []string) error {
 	args := append([]string{"paru", "-S", "--ask", "4"}, packages...)
 	err := common.RunCommand(args...)
 	return err
