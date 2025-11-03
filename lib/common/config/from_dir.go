@@ -28,7 +28,7 @@ func fromDir(dir string) Config {
 		entryConfig := fromFile(fullName)
 		mergeConfigs(&config, entryConfig)
 	}
-	log.Info("Using merged config: %v", config)
+	log.Info("Using merged config:\n%v", config)
 	return config
 }
 
