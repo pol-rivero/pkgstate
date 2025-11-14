@@ -14,11 +14,12 @@ func (l *SystemdTool) GatherData(config *config.Config) error {
 	if err != nil {
 		return err
 	}
-	l.UnitMismatches = getUnitMismatches(currentUnits, desiredUnits)
+	currentUnitsCollection := systemdUnitCollectionFromListUnitFilesOutput(currentUnits)
+	l.UnitMismatches = getUnitMismatches(currentUnitsCollection, desiredUnits)
 	return nil
 }
 
-func getCurrentUnits(systemScope bool) (SystemdUnitCollection, error) {
+func getCurrentUnits(systemScope bool) ([]SystemdListUnitFilesOutput, error) {
 	jsonOutput, err := common.RunCommandGetOutput("systemctl", getScopeFlag(systemScope), "list-unit-files", "--all", "--no-pager", "--output=json")
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func getCurrentUnits(systemScope bool) (SystemdUnitCollection, error) {
 	if err := json.Unmarshal([]byte(jsonOutput), &output); err != nil {
 		return nil, fmt.Errorf("error parsing systemctl list-unit-files output: %w", err)
 	}
-	return systemdUnitCollectionFromListUnitFilesOutput(output), nil
+	return output, nil
 }
 
 func getScopeFlag(systemScope bool) string {
