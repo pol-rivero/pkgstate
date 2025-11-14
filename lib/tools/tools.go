@@ -12,6 +12,7 @@ type Tool interface {
 	GatherData(*config.Config) error
 	PrintDiff()
 	ApplyFixes(requestConfirmation bool)
+	GenerateConfig(*config.Config) error
 }
 
 func CreateTools() []Tool {

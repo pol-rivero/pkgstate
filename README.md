@@ -16,40 +16,42 @@ You can also build it from source by installing `pkgstate` or `pkgstate-git`.
 1. `pkgstate` is meant to used with a dotfiles repository. If you don't have one yet, I recommend checking [the `doot` Getting Started guide](https://github.com/pol-rivero/doot/wiki/Getting-Started),
     but you can use any dotfiles manager you like.
 
-1. Create a directory for your package definitions. By default, `~/.config/packages/` is used, but you can change this with the `PKGSTATE_DIR` environment variable.
+2. Create a directory for your package definitions. By default, `~/.config/packages/` is used, but you can change this with the `PKGSTATE_DIR` environment variable.
 
-1. Inside that directory, create one or more YAML files defining the desired state of your system.
-    ```yaml
-    # Packages to be installed. All other packages will be uninstalled.
-    packages:
-      - base-devel
-      - git
-      - ssh
-      - docker
+3. Inside that directory, create one or more YAML files defining the desired state of your system. To use your current state as a starting point, you can run `pkgstate generate`.
 
-    # User groups the current user should be a member of. Groups not listed here will be ignored (not modified).
-    groups:
-      - wheel
-      - docker
+```yaml
+# Packages to be explicitly installed. All other packages will be uninstalled (or marked as dependencies).
+packages:
+  - base-devel
+  - git
+  - ssh
+  - docker
 
-    # Systemd units to be enabled/disabled (systemd --system). Units not listed here will be ignored (not modified).
-    systemd: 
-      sshd.service: enabled
-      docker.socket: enabled
-      docker.service: disabled
+# User groups that the current user must be a member of. Groups not listed here will be ignored (not modified).
+groups:
+  - wheel
+  - docker
 
-    # Systemd units to be enabled/disabled (systemd --user). Units not listed here will be ignored (not modified).
-    systemd_user:
-      my-timer.timer: enabled
-      another-service.service: disabled
-    ```
-    > [!TIP]
-    > All `.yaml` files in the config directory will be merged together. This is known as ["drop-in" configuration](https://devoptimize.org/practices/drop-in-configuration/), and allows you to have separate files for specific use cases.  
-    > For example, `printing.yaml` would define all packages, user groups, and systemd units related to controlling a printer.
+# Systemd units to be enabled/disabled (systemd --system). Units not listed here will be ignored (not modified).
+systemd: 
+  sshd.service: enabled
+  docker.socket: enabled
+  docker.service: disabled
 
-1. Run `pkgstate` to get the diff of the current state vs the desired state.
+# Systemd units to be enabled/disabled (systemd --user). Units not listed here will be ignored (not modified).
+systemd_user:
+  my-timer.timer: enabled
+  another-service.service: disabled
+```
 
-1. Run `pkgstate fix` to interactively apply the changes, or `pkgstate fix --yes` to apply them without confirmation.
+> [!TIP]
+> All `.yaml` files in the config directory will be merged together. This is known as ["drop-in" configuration](https://devoptimize.org/practices/drop-in-configuration/), and allows you to have separate files for specific use cases.  
+> For example, `printing.yaml` would define all packages, user groups, and systemd units related to controlling a printer.
+
+4. Run `pkgstate` to get the diff of the current state vs. the desired state.
+
+5. Run `pkgstate fix` to interactively apply the changes, or `pkgstate fix --yes` to apply them without confirmation.
 
 
 ## FAQs
@@ -66,7 +68,7 @@ Please note that, if `pacman` is the only available package manager, you won't b
 
 ### Can I use `pkgstate` on non-Arch Linux distributions?
 
-> Yes, as long as they use `pacman` and `systemd`. This includes all Arch-based distributions like Manjaro, EndeavourOS, etc.
+> Yes, as long as they use `pacman` and `systemd`. This includes most Arch-based distributions like Manjaro, EndeavourOS, etc.
 
 ### Does `pkgstate` support per-host configurations?
 

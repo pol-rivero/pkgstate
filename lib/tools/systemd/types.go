@@ -5,8 +5,9 @@ import (
 )
 
 type SystemdListUnitFilesOutput struct {
-	UnitFile string `json:"unit_file"`
-	State    string `json:"state"`
+	UnitFile string  `json:"unit_file"`
+	State    string  `json:"state"`
+	Preset   *string `json:"preset"`
 }
 
 type SystemdUnitName string
