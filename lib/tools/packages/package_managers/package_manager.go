@@ -9,6 +9,7 @@ var PACKAGE_MANAGERS = []PackageManager{
 	&Yay{},
 	&Paru{},
 	&Pacman{},
+	&Apt{},
 }
 
 type PackageManager interface {
