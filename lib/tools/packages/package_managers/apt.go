@@ -9,15 +9,11 @@ import (
 type Apt struct{}
 
 func (a *Apt) GetBinaryName() string {
-	return "apt"
+	return "apt-get"
 }
 
 func (a *Apt) GetAllInstalledPackages() ([]string, error) {
-	output, err := common.RunCommandGetOutput("apt", "list", "--installed")
-	if err != nil {
-		return nil, err
-	}
-	return a.parseAptListOutput(output), nil
+	return common.RunCommandGetLines("dpkg-query", "-f", "${Package}\n", "-W")
 }
 
 func (a *Apt) GetExplicitlyInstalledPackages() ([]string, error) {
@@ -49,60 +45,30 @@ func (a *Apt) markPackagesAsDependency(packages []string) error {
 }
 
 func (a *Apt) cleanUnusedDependencies(packagesAllowedToBeRemoved []string) error {
-	// First, get the list of packages that would be autoremoved
-	output, err := common.RunCommandGetOutput("apt-get", "--dry-run", "autoremove",
+	lines, err := common.RunCommandGetLines("apt-get", "--dry-run", "autoremove",
 		"-o", "APT::AutoRemove::RecommendsImportant=0",
 		"-o", "APT::AutoRemove::SuggestsImportant=0")
 	if err != nil {
 		return err
 	}
-	orphanedPackages := a.parseAutoremoveOutput(output)
+	orphanedPackages := a.parseAutoremoveOutput(lines)
 	packagesToRemove := common.IntersectionOfOrderedSlices(packagesAllowedToBeRemoved, common.Sorted(orphanedPackages))
 	if len(packagesToRemove) == 0 {
 		return nil
 	}
-	args := append([]string{"sudo", "apt-get", "autoremove", "-y",
-		"-o", "APT::AutoRemove::RecommendsImportant=0",
-		"-o", "APT::AutoRemove::SuggestsImportant=0"}, packagesToRemove...)
+	args := append([]string{"sudo", "apt-get", "remove", "-y"}, packagesToRemove...)
 	return common.RunCommand(args...)
 }
 
-// parseAptListOutput parses the output of 'apt list --installed' command.
-// The output format is: "package/source version [arch]" or "package/source version arch [upgradable]"
-// We only need the package name (before the '/').
-func (a *Apt) parseAptListOutput(output string) []string {
-	lines := strings.Split(output, "\n")
-	packages := []string{}
+func (a *Apt) parseAutoremoveOutput(lines []string) []string {
+	packages := make([]string, 0, len(lines))
 	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" || line == "Listing..." {
-			continue
-		}
-		// Extract package name (everything before the '/')
-		if idx := strings.Index(line, "/"); idx > 0 {
-			packages = append(packages, line[:idx])
-		}
-	}
-	return packages
-}
-
-// parseAutoremoveOutput parses the output of 'apt-get --dry-run autoremove' command.
-// It extracts the list of packages that would be removed.
-func (a *Apt) parseAutoremoveOutput(output string) []string {
-	lines := strings.Split(output, "\n")
-	packages := []string{}
-	inRemoveSection := false
-	for _, line := range lines {
+		// Line format: "Remv package [version]" or "Remv package (version)"
 		if strings.HasPrefix(line, "Remv ") {
-			// Line format: "Remv package [version]" or "Remv package (version)"
 			parts := strings.Fields(line)
 			if len(parts) >= 2 {
 				packages = append(packages, parts[1])
 			}
-			inRemoveSection = true
-		} else if inRemoveSection && !strings.HasPrefix(line, "Remv ") && strings.TrimSpace(line) != "" {
-			// We've moved past the removal section
-			inRemoveSection = false
 		}
 	}
 	return packages
