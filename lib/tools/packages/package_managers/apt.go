@@ -13,7 +13,11 @@ func (a *Apt) GetBinaryName() string {
 }
 
 func (a *Apt) GetAllInstalledPackages() ([]string, error) {
-	return common.RunCommandGetLines("dpkg-query", "-f", "${Package}\n", "-W")
+	lines, err := common.RunCommandGetLines("dpkg-query", "-f", "${db:Status-Abbrev} ${Package}\n", "-W")
+	if err != nil {
+		return nil, err
+	}
+	return a.parseDpkgQueryOutput(lines), nil
 }
 
 func (a *Apt) GetExplicitlyInstalledPackages() ([]string, error) {
@@ -68,6 +72,22 @@ func (a *Apt) parseAutoremoveOutput(lines []string) []string {
 			parts := strings.Fields(line)
 			if len(parts) >= 2 {
 				packages = append(packages, parts[1])
+			}
+		}
+	}
+	return packages
+}
+
+func (a *Apt) parseDpkgQueryOutput(lines []string) []string {
+	packages := make([]string, 0, len(lines))
+	for _, line := range lines {
+		// Line format: "Status Package"
+		parts := strings.Fields(line)
+		if len(parts) >= 2 {
+			status := parts[0]
+			pkg := parts[1]
+			if status == "ii" {
+				packages = append(packages, pkg)
 			}
 		}
 	}
