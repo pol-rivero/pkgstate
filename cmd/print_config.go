@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	printconfig "github.com/pol-rivero/pkgstate/lib/commands/print_config"
+	"github.com/pol-rivero/pkgstate/lib/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ var printConfigCmd = &cobra.Command{
 	Short:   "Prints the effective configuration resulting from merging all config files. This can be useful for debugging.",
 	Run: func(cmd *cobra.Command, args []string) {
 		SetUpLogger(cmd)
-		printconfig.PrintConfig()
+		commands.PrintConfig()
 	},
 }
 

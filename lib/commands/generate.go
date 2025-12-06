@@ -1,4 +1,4 @@
-package generate
+package commands
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func Generate() {
 	for _, tool := range toolList {
 		err := tool.GenerateConfig(&cfg)
 		if err != nil {
-			log.Fatal("Failed to %s: %v", tool.FriendlyProcessName(), err)
+			log.Error("Failed to %s (skipping): %v", tool.FriendlyProcessName(), err)
 		}
 	}
 

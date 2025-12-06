@@ -13,6 +13,10 @@ func (l *SystemdTool) FriendlyProcessName() string {
 	}
 }
 
+func (l *SystemdTool) Cleanup(requestConfirmation bool) {
+	// No cleanup required
+}
+
 func NewSystemdTool(systemScope bool) *SystemdTool {
 	return &SystemdTool{
 		SystemScope: systemScope,

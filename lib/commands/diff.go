@@ -1,4 +1,4 @@
-package diff
+package commands
 
 import (
 	"sync"
@@ -17,7 +17,7 @@ func Diff() {
 		startTime := time.Now()
 		err := t.GatherData(&config)
 		if err != nil {
-			log.Fatal("Failed to %s: %v", t.FriendlyProcessName(), err)
+			log.Error("Failed to %s (skipping): %v", t.FriendlyProcessName(), err)
 		}
 		log.Info("Time taken to %s: %s", t.FriendlyProcessName(), time.Since(startTime))
 		waitGroup.Done()

@@ -40,7 +40,13 @@ func RunCommandGetLines(commandAndArgs ...string) ([]string, error) {
 		return nil, err
 	}
 	lines := strings.Split(output, "\n")
-	return lines, nil
+	nonEmptyLines := make([]string, 0, len(lines))
+	for _, line := range lines {
+		if line != "" {
+			nonEmptyLines = append(nonEmptyLines, line)
+		}
+	}
+	return nonEmptyLines, nil
 }
 
 func IsCommandAvailable(commandName string) bool {

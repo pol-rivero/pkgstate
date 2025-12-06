@@ -1,6 +1,6 @@
 # pkgstate
 
-Declarative package management for Arch Linux, without the pain of using Nix. Define the desired state of installed packages in a set of YAML files, and `pkgstate` will ensure that
+Declarative package management for Linux, without the pain of using Nix. Define the desired state of installed packages in a set of YAML files, and `pkgstate` will ensure that
 the system matches that state.
 
 In addition to installed packages, `pkgstate` can also track enabled/disabled systemd units (services, timers, etc.) and which groups the current user
@@ -8,8 +8,34 @@ is a member of, as some packages need specific group memberships to function pro
 
 ## Installation
 
-Install `pkgstate-bin` from the [AUR](https://aur.archlinux.org/packages/pkgstate-bin/).  
+<details>
+<summary>From the <b>AUR</b> (Arch Linux, Manjaro, and other Arch-based distributions)</summary>
+
+&nbsp;  
+I recommend installing the `pkgstate-bin` package, which is a pre-compiled binary.
+
 You can also build it from source by installing `pkgstate` or `pkgstate-git`.
+
+</details>
+
+<details>
+<summary>Using the <b>installer script</b> (other distros)</summary>
+
+&nbsp;  
+Run the following command:
+
+```sh
+curl -sSL get-pkgstate.polrivero.com | sh
+```
+
+- You can inspect the script before running it: `curl -sSL get-pkgstate.polrivero.com`
+
+- Make sure to run this command periodically or set up a cron job in order to keep `pkgstate` up to date.
+
+- To uninstall, run the following command: `sudo rm $(which pkgstate)`
+
+</details>
+
 
 ## How to use
 
@@ -53,26 +79,32 @@ systemd_user:
 
 5. Run `pkgstate fix` to interactively apply the changes, or `pkgstate fix --yes` to apply them without confirmation.
 
+> [!WARNING]
+> By default, `pkgstate` is not fully declarative because it doesn't remove *optional dependencies* (pacman), nor *recommended + suggested packages* (apt). This is done to avoid silently removing dependencies that the user might want to keep installed.  
+> To make your system completely declarative, you should add the optional dependencies you want to keep to your config, and periodically run `pkgstate clean` to remove all unused optional dependencies.
+
 
 ## FAQs
 
 ### Should I run `pkgstate` as root?
 
-> No, run it as a normal user. `pkgstate` will invoke `sudo` when necessary.
+No, run it as a normal user. `pkgstate` will invoke `sudo` when necessary.
 
-### Which package managers are supported?
+### Which package managers and distros are supported?
 
-> The currently supported managers are `pacman`, `yay`, and `paru`.  
-`pkgstate` will automatically detect and use the best available package manager on your system.  
-Please note that, if `pacman` is the only available package manager, you won't be able to install AUR packages using `pkgstate`.
+`pkgstate` will automatically detect and use the best available package manager on your system. The currently supported package managers are:
+- `apt` (Debian, Ubuntu, and derivatives)
+- `pacman`, `yay` and `paru` (Arch Linux, Manjaro, and derivatives)
 
-### Can I use `pkgstate` on non-Arch Linux distributions?
+Please note that if `pacman` is the only available package manager, you won't be able to install AUR packages using `pkgstate`.
 
-> Yes, as long as they use `pacman` and `systemd`. This includes most Arch-based distributions like Manjaro, EndeavourOS, etc.
+### Can I use `pkgstate` on non-systemd distros?
+
+Yes, you can still use `pkgstate` to track installed packages and user groups.
 
 ### Does `pkgstate` support per-host configurations?
 
-> Not directly, and that's by design.  
+Not directly, and that's by design.  
 Per-host configs should be the responsibility of your dotfiles manager, not individual programs like `pkgstate`. This ensures that host-specific logic is centralized in a single place, making it easier to manage and debug. For example, if you rename your computer, you only need to change the name in the dotfiles manager configuration, rather than updating multiple programs' configs.  
->
-> In its place, `pkgstate` supports drop-in configuration (see "Tip" above), which allows your dotfiles manager to install the appropriate config files for each host.
+
+In its place, `pkgstate` supports drop-in configuration (see "Tip" above), which allows your dotfiles manager to install the appropriate config files for each host.
