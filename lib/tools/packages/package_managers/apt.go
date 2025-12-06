@@ -60,7 +60,7 @@ func (a *Apt) cleanUnusedDependencies(packagesAllowedToBeRemoved []string) error
 	if len(packagesToRemove) == 0 {
 		return nil
 	}
-	args := append([]string{"sudo", "apt-get", "remove", "-y"}, packagesToRemove...)
+	args := append([]string{"sudo", "apt-get", "remove", "--auto-remove", "-y"}, packagesToRemove...)
 	return common.RunCommand(args...)
 }
 
