@@ -16,17 +16,19 @@ func (p *Pacman) GetExplicitlyInstalledPackages() ([]string, error) {
 	return common.RunCommandGetLines("pacman", "-Qqe")
 }
 
-func (p *Pacman) RemovePackages(packages []string) error {
-	// Naively running 'pacman -R' can fail if some packages are a dependency of other (non-removed) packages.
-	// To avoid that, first mark the packages as dependencies, and then remove only those that became orphans.
-	if err := p.markPackagesAsDependency(packages); err != nil {
-		return err
-	}
-	return p.cleanUnusedDependencies(packages)
+func (p *Pacman) GetOrphanedPackages() ([]string, error) {
+	// 'pacman -Qdtq' lists all the orphaned packages, UNLESS they are an optional dependency of another package.
+	// Pass a second t to include those optional dependencies as well.
+	return common.RunCommandGetLines("pacman", "-Qdttq")
 }
 
 func (p *Pacman) MarkPackagesAsExplicitlyInstalled(packages []string) error {
 	args := append([]string{"sudo", "pacman", "-D", "--asexplicit"}, packages...)
+	return common.RunCommand(args...)
+}
+
+func (p *Pacman) MarkPackagesAsDependency(packages []string) error {
+	args := append([]string{"sudo", "pacman", "-D", "--asdep"}, packages...)
 	return common.RunCommand(args...)
 }
 
@@ -37,22 +39,7 @@ func (p *Pacman) InstallPackages(packages []string) error {
 	return common.RunCommand(args...)
 }
 
-func (p *Pacman) markPackagesAsDependency(packages []string) error {
-	args := append([]string{"sudo", "pacman", "-D", "--asdep"}, packages...)
-	return common.RunCommand(args...)
-}
-
-func (p *Pacman) cleanUnusedDependencies(packagesAllowedToBeRemoved []string) error {
-	// 'pacman -Qdtq' lists all the orphaned packages, UNLESS they are an optional dependency of another package.
-	// Pass a second t to include those optional dependencies as well.
-	orphanedPackages, err := common.RunCommandGetLines("pacman", "-Qdttq")
-	if err != nil {
-		return err
-	}
-	packagesToRemove := common.IntersectionOfOrderedSlices(packagesAllowedToBeRemoved, common.Sorted(orphanedPackages))
-	if len(packagesToRemove) == 0 {
-		return nil
-	}
-	args := append([]string{"sudo", "pacman", "-Rs", "--noconfirm"}, packagesToRemove...)
+func (p *Pacman) RemovePackages(packages []string) error {
+	args := append([]string{"sudo", "pacman", "-Rs", "--noconfirm"}, packages...)
 	return common.RunCommand(args...)
 }

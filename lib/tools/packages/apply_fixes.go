@@ -6,6 +6,7 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common"
 	"github.com/pol-rivero/pkgstate/lib/common/log"
 	"github.com/pol-rivero/pkgstate/lib/common/prompt"
+	pm "github.com/pol-rivero/pkgstate/lib/tools/packages/package_managers"
 )
 
 func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
@@ -30,11 +31,28 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 	}
 	if len(toRemove) > 0 {
 		if ynPrompt(requestConfirmation, "Do you want to remove the following packages?\n%s", toRemove) {
-			checkErr(packageManager.RemovePackages(toRemove), "remove packages")
+			checkErr(removePackages(packageManager, toRemove), "remove packages")
 		} else {
 			log.Info("Skipping removal of packages.")
 		}
 	}
+}
+
+func removePackages(packageManager pm.PackageManager, packagesToPotentiallyRemove []string) error {
+	// Naively calling RemovePackages can fail if some packages are a dependency of other (non-removed) packages.
+	// To avoid that, first mark the packages as dependencies, and then remove only those that became orphans.
+	if err := packageManager.MarkPackagesAsDependency(packagesToPotentiallyRemove); err != nil {
+		return err
+	}
+	orphanedPackages, err := packageManager.GetOrphanedPackages()
+	if err != nil {
+		return err
+	}
+	packagesToRemove := common.IntersectionOfOrderedSlices(packagesToPotentiallyRemove, common.Sorted(orphanedPackages))
+	if len(packagesToRemove) == 0 {
+		return nil
+	}
+	return packageManager.RemovePackages(packagesToRemove)
 }
 
 func ynPrompt(requestConfirmation bool, message string, packages []string) bool {

@@ -24,17 +24,23 @@ func (a *Apt) GetExplicitlyInstalledPackages() ([]string, error) {
 	return common.RunCommandGetLines("apt-mark", "showmanual")
 }
 
-func (a *Apt) RemovePackages(packages []string) error {
-	// Same pattern as pacman: first mark the packages as dependencies,
-	// and then remove only those that became orphans.
-	if err := a.markPackagesAsDependency(packages); err != nil {
-		return err
+func (a *Apt) GetOrphanedPackages() ([]string, error) {
+	lines, err := common.RunCommandGetLines("apt-get", "--dry-run", "autoremove",
+		"-o", "APT::AutoRemove::RecommendsImportant=0",
+		"-o", "APT::AutoRemove::SuggestsImportant=0")
+	if err != nil {
+		return nil, err
 	}
-	return a.cleanUnusedDependencies(packages)
+	return a.parseAutoremoveOutput(lines), nil
 }
 
 func (a *Apt) MarkPackagesAsExplicitlyInstalled(packages []string) error {
 	args := append([]string{"sudo", "apt-mark", "manual"}, packages...)
+	return common.RunCommand(args...)
+}
+
+func (a *Apt) MarkPackagesAsDependency(packages []string) error {
+	args := append([]string{"sudo", "apt-mark", "auto"}, packages...)
 	return common.RunCommand(args...)
 }
 
@@ -43,24 +49,8 @@ func (a *Apt) InstallPackages(packages []string) error {
 	return common.RunCommand(args...)
 }
 
-func (a *Apt) markPackagesAsDependency(packages []string) error {
-	args := append([]string{"sudo", "apt-mark", "auto"}, packages...)
-	return common.RunCommand(args...)
-}
-
-func (a *Apt) cleanUnusedDependencies(packagesAllowedToBeRemoved []string) error {
-	lines, err := common.RunCommandGetLines("apt-get", "--dry-run", "autoremove",
-		"-o", "APT::AutoRemove::RecommendsImportant=0",
-		"-o", "APT::AutoRemove::SuggestsImportant=0")
-	if err != nil {
-		return err
-	}
-	orphanedPackages := a.parseAutoremoveOutput(lines)
-	packagesToRemove := common.IntersectionOfOrderedSlices(packagesAllowedToBeRemoved, common.Sorted(orphanedPackages))
-	if len(packagesToRemove) == 0 {
-		return nil
-	}
-	args := append([]string{"sudo", "apt-get", "remove", "--auto-remove", "-y"}, packagesToRemove...)
+func (a *Apt) RemovePackages(packages []string) error {
+	args := append([]string{"sudo", "apt-get", "remove", "--auto-remove", "-y"}, packages...)
 	return common.RunCommand(args...)
 }
 

@@ -16,9 +16,11 @@ type PackageManager interface {
 	GetBinaryName() string
 	GetAllInstalledPackages() ([]string, error)
 	GetExplicitlyInstalledPackages() ([]string, error)
+	GetOrphanedPackages() ([]string, error)
+	MarkPackagesAsExplicitlyInstalled(packages []string) error
+	MarkPackagesAsDependency(packages []string) error
 	InstallPackages(packages []string) error
 	RemovePackages(packages []string) error
-	MarkPackagesAsExplicitlyInstalled(packages []string) error
 }
 
 func FindPreferredPackageManager() PackageManager {
