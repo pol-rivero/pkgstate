@@ -6,10 +6,15 @@ import (
 
 	"github.com/pol-rivero/pkgstate/lib/common"
 	"github.com/pol-rivero/pkgstate/lib/common/config"
+	"github.com/pol-rivero/pkgstate/lib/common/log"
 )
 
 func (l *SystemdTool) GatherData(config *config.Config) error {
 	desiredUnits := systemdUnitCollectionFromMap(getDesiredUnits(config, l.SystemScope))
+	if len(desiredUnits) == 0 {
+		log.Info("Skipping systemd (%s): no desired units found", getScopeFlag(l.SystemScope))
+		return nil
+	}
 	currentUnits, err := getCurrentUnits(l.SystemScope)
 	if err != nil {
 		return err
