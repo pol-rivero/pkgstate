@@ -16,7 +16,7 @@ func (l *PackagesTool) Cleanup(requestConfirmation bool) {
 		prompt := "This will make your system fully declarative but might break things. Carefully review this list and " +
 			"modify the configuration file to keep the packages you still need.\nDo you want to remove the following packages?\n%s"
 		if ynPromptDefaultNo(requestConfirmation, prompt, orphanedPackages) {
-			checkErr(removePackages(packageManager, orphanedPackages), "remove packages")
+			checkErr(packageManager.RemovePackages(orphanedPackages), "remove packages")
 		} else {
 			log.Info("Skipping removal of packages.")
 		}
