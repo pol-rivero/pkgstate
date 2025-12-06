@@ -36,9 +36,6 @@ func RunCommandGetOutput(commandAndArgs ...string) (string, error) {
 
 func RunCommandGetLines(commandAndArgs ...string) ([]string, error) {
 	output, err := RunCommandGetOutput(commandAndArgs...)
-	if err != nil {
-		return nil, err
-	}
 	lines := strings.Split(output, "\n")
 	nonEmptyLines := make([]string, 0, len(lines))
 	for _, line := range lines {
@@ -46,7 +43,7 @@ func RunCommandGetLines(commandAndArgs ...string) ([]string, error) {
 			nonEmptyLines = append(nonEmptyLines, line)
 		}
 	}
-	return nonEmptyLines, nil
+	return nonEmptyLines, err
 }
 
 func IsCommandAvailable(commandName string) bool {

@@ -17,9 +17,14 @@ func (p *Pacman) GetExplicitlyInstalledPackages() ([]string, error) {
 }
 
 func (p *Pacman) GetOrphanedPackages() ([]string, error) {
-	// 'pacman -Qdtq' lists all the orphaned packages, UNLESS they are an optional dependency of another package.
+	// 'pacman -Qdtq' lists all the orphaned lines, UNLESS they are an optional dependency of another package.
 	// Pass a second t to include those optional dependencies as well.
-	return common.RunCommandGetLines("pacman", "-Qdttq")
+	lines, err := common.RunCommandGetLines("pacman", "-Qdttq")
+	// pacman returns exit code 1 if there are no orphaned packages. If there is no stderr+stdout output, treat as success.
+	if err == nil || len(lines) == 0 {
+		return lines, nil
+	}
+	return nil, err
 }
 
 func (p *Pacman) MarkPackagesAsExplicitlyInstalled(packages []string) error {
