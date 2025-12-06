@@ -14,6 +14,10 @@ func (l *GroupsTool) FriendlyProcessName() string {
 	return "get user groups"
 }
 
+func (l *GroupsTool) Cleanup(requestConfirmation bool) {
+	// No cleanup required
+}
+
 func NewGroupsTool() *GroupsTool {
 	return &GroupsTool{}
 }

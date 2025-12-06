@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/pol-rivero/pkgstate/lib/commands/generate"
+	"github.com/pol-rivero/pkgstate/lib/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ var generateCmd = &cobra.Command{
 	Short:   "Generates a configuration based on the current system state",
 	Run: func(cmd *cobra.Command, args []string) {
 		SetUpLogger(cmd)
-		generate.Generate()
+		commands.Generate()
 	},
 }
 

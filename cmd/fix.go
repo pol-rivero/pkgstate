@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/pol-rivero/pkgstate/lib/commands/fix"
+	"github.com/pol-rivero/pkgstate/lib/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var fixCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		fix.Fix(noConfirm)
+		commands.Fix(noConfirm)
 	},
 }
 

@@ -1,23 +1,22 @@
-package generate
+package commands
 
 import (
-	"fmt"
-
 	"github.com/pol-rivero/pkgstate/lib/common/config"
 	"github.com/pol-rivero/pkgstate/lib/common/log"
 	"github.com/pol-rivero/pkgstate/lib/tools"
 )
 
-func Generate() {
-	cfg := config.Config{}
-
+func Fix(noConfirm bool) {
+	config := config.GetConfig()
 	toolList := tools.CreateTools()
 	for _, tool := range toolList {
-		err := tool.GenerateConfig(&cfg)
+		// Fixes from one tool may affect others, so don't gather data in parallel
+		err := tool.GatherData(&config)
 		if err != nil {
 			log.Error("Failed to %s (skipping): %v", tool.FriendlyProcessName(), err)
+			continue
 		}
+		requestConfirmation := !noConfirm
+		tool.ApplyFixes(requestConfirmation)
 	}
-
-	fmt.Printf("%v", cfg)
 }

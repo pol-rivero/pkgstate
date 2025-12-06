@@ -1,4 +1,4 @@
-package printconfig
+package commands
 
 import (
 	"fmt"

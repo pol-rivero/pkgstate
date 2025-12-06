@@ -13,6 +13,7 @@ type Tool interface {
 	PrintDiff()
 	ApplyFixes(requestConfirmation bool)
 	GenerateConfig(*config.Config) error
+	Cleanup(requestConfirmation bool)
 }
 
 func CreateTools() []Tool {

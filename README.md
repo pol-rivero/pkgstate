@@ -80,8 +80,8 @@ systemd_user:
 5. Run `pkgstate fix` to interactively apply the changes, or `pkgstate fix --yes` to apply them without confirmation.
 
 > [!WARNING]
-> By default, `pkgstate` is not fully declarative because it doesn't remove *orphan packages* (dependencies that are no longer needed), nor *recommended packages* (APT only - dependencies that are not strictly required in order to function). This is done to avoid silently removing non-explicit packages that the user might want to keep installed, especially *recommended* *packages* in APT.  
-> To make your system completely declarative, you should periodically run `pkgstate clean` and either proceed with the cleanup or cancel and add the packages you want to keep to your config.
+> By default, `pkgstate` is not fully declarative because it doesn't remove *optional dependencies* (pacman), nor *recommended + suggested packages* (apt). This is done to avoid silently removing dependencies that the user might want to keep installed.  
+> To make your system completely declarative, you should add the optional dependencies you want to keep to your config, and periodically run `pkgstate clean` to remove all unused optional dependencies.
 
 
 ## FAQs
