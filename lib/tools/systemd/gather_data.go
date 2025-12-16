@@ -21,6 +21,7 @@ func (l *SystemdTool) GatherData(config *config.Config) error {
 	}
 	currentUnitsCollection := systemdUnitCollectionFromListUnitFilesOutput(currentUnits)
 	l.UnitMismatches = getUnitMismatches(currentUnitsCollection, desiredUnits)
+	checkNonExistentUnits(currentUnitsCollection, desiredUnits, l.SystemScope)
 	return nil
 }
 
@@ -34,6 +35,14 @@ func getCurrentUnits(systemScope bool) ([]SystemdListUnitFilesOutput, error) {
 		return nil, fmt.Errorf("error parsing systemctl list-unit-files output: %w", err)
 	}
 	return output, nil
+}
+
+func checkNonExistentUnits(currentUnits, desiredUnits SystemdUnitCollection, systemScope bool) {
+	for unitName := range desiredUnits {
+		if _, exists := currentUnits[unitName]; !exists {
+			log.Warning("Systemd [%s] unit '%s' doesn't exist!", getScopeFlag(systemScope), unitName)
+		}
+	}
 }
 
 func getScopeFlag(systemScope bool) string {
