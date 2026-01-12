@@ -7,9 +7,10 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common/log"
 	"github.com/pol-rivero/pkgstate/lib/common/prompt"
 	pm "github.com/pol-rivero/pkgstate/lib/tools/packages/package_managers"
+	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
+func (l *PackagesTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
 	toInstall := common.DifferenceOfOrderedSlices(l.DesiredPackages, l.AllInstalledPackages)
 	toRemove := common.DifferenceOfOrderedSlices(l.ExplicitlyInstalledPackages, l.DesiredPackages)
 	toMarkAsExplicit := l.installedAndDesiredAndNotAlreadyExplicit()
@@ -18,6 +19,7 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 	if len(toInstall) > 0 {
 		if ynPrompt(requestConfirmation, "Do you want to install the following packages?\n%s", toInstall) {
 			checkErr(packageManager.InstallPackages(toInstall), "install packages")
+			return ProcessAgain
 		} else {
 			log.Info("Skipping installation of packages.")
 		}
@@ -25,6 +27,7 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 	if len(toMarkAsExplicit) > 0 {
 		if ynPrompt(requestConfirmation, "Do you want to mark the following packages as explicitly installed?\n%s", toMarkAsExplicit) {
 			checkErr(packageManager.MarkPackagesAsExplicitlyInstalled(toMarkAsExplicit), "mark packages as explicitly installed")
+			return ProcessAgain
 		} else {
 			log.Info("Skipping marking packages as explicitly installed.")
 		}
@@ -36,6 +39,7 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) {
 			log.Info("Skipping removal of packages.")
 		}
 	}
+	return Done
 }
 
 func removePackages(packageManager pm.PackageManager, packagesToPotentiallyRemove []string) error {

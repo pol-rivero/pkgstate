@@ -6,9 +6,10 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common"
 	"github.com/pol-rivero/pkgstate/lib/common/log"
 	"github.com/pol-rivero/pkgstate/lib/common/prompt"
+	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *GroupsTool) ApplyFixes(requestConfirmation bool) {
+func (l *GroupsTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
 	for _, group := range l.MissingGroups {
 		if !group.Exists && !createUserGroup(group.Name, requestConfirmation) {
 			continue
@@ -18,6 +19,7 @@ func (l *GroupsTool) ApplyFixes(requestConfirmation bool) {
 		}
 		fmt.Printf("-> Successfully added user '%s' to group '%s'\n", l.UserName, group.Name)
 	}
+	return Done
 }
 
 func createUserGroup(groupName string, requestConfirmation bool) bool {

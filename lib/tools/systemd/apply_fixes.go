@@ -6,9 +6,10 @@ import (
 	"github.com/pol-rivero/pkgstate/lib/common"
 	"github.com/pol-rivero/pkgstate/lib/common/log"
 	"github.com/pol-rivero/pkgstate/lib/common/prompt"
+	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
+func (l *SystemdTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
 	sudo := getSudoPrefix(l.SystemScope)
 	scope := getScopeFlag(l.SystemScope)
 	for _, mismatch := range l.UnitMismatches {
@@ -34,6 +35,7 @@ func (l *SystemdTool) ApplyFixes(requestConfirmation bool) {
 		}
 		fmt.Printf("-> Successfully updated unit '%s' to state '%s'\n", mismatch.UnitName, mismatch.DesiredState)
 	}
+	return Done
 }
 
 func getActionForDesiredState(desiredState SystemdUnitState) (string, error) {
