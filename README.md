@@ -39,7 +39,7 @@ curl -sSL get-pkgstate.polrivero.com | sh
 
 ## How to use
 
-1. `pkgstate` is meant to used with a dotfiles repository. If you don't have one yet, I recommend checking [the `doot` Getting Started guide](https://github.com/pol-rivero/doot/wiki/Getting-Started),
+1. `pkgstate` is meant to be used with a dotfiles repository. If you don't have one yet, I recommend checking [the `doot` Getting Started guide](https://github.com/pol-rivero/doot/wiki/Getting-Started),
     but you can use any dotfiles manager you like.
 
 2. Create a directory for your package definitions. By default, `~/.config/packages/` is used, but you can change this with the `PKGSTATE_DIR` environment variable.
