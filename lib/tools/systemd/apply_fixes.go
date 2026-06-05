@@ -9,7 +9,7 @@ import (
 	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *SystemdTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
+func (l *SystemdTool) ApplyFixes(requestConfirmation bool, _ bool) ApplyFixesResult {
 	sudo := getSudoPrefix(l.SystemScope)
 	scope := getScopeFlag(l.SystemScope)
 	for _, mismatch := range l.UnitMismatches {

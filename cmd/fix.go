@@ -15,7 +15,11 @@ var fixCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		commands.Fix(noConfirm)
+		noRemove, err := cmd.Flags().GetBool("no-remove")
+		if err != nil {
+			panic(err)
+		}
+		commands.Fix(noConfirm, noRemove)
 	},
 }
 
@@ -24,4 +28,5 @@ func init() {
 
 	fixCmd.Args = cobra.NoArgs
 	fixCmd.Flags().BoolP("yes", "y", false, "Apply changes without confirmation.")
+	fixCmd.Flags().Bool("no-remove", false, "Do not uninstall any packages, even when --yes is passed.")
 }

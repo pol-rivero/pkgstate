@@ -10,7 +10,7 @@ import (
 	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *PackagesTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
+func (l *PackagesTool) ApplyFixes(requestConfirmation bool, noRemove bool) ApplyFixesResult {
 	toInstall := common.DifferenceOfOrderedSlices(l.DesiredPackages, l.AllInstalledPackages)
 	toRemove := common.DifferenceOfOrderedSlices(l.ExplicitlyInstalledPackages, l.DesiredPackages)
 	toMarkAsExplicit := l.installedAndDesiredAndNotAlreadyExplicit()
@@ -33,7 +33,9 @@ func (l *PackagesTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
 		}
 	}
 	if len(toRemove) > 0 {
-		if ynPrompt(requestConfirmation, "Do you want to remove the following packages?\n%s", toRemove) {
+		if noRemove {
+			log.Info("Skipping removal of packages (--no-remove).")
+		} else if ynPrompt(requestConfirmation, "Do you want to remove the following packages?\n%s", toRemove) {
 			checkErr(removePackages(packageManager, toRemove), "remove packages")
 		} else {
 			log.Info("Skipping removal of packages.")

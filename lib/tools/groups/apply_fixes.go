@@ -9,7 +9,7 @@ import (
 	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func (l *GroupsTool) ApplyFixes(requestConfirmation bool) ApplyFixesResult {
+func (l *GroupsTool) ApplyFixes(requestConfirmation bool, _ bool) ApplyFixesResult {
 	for _, group := range l.MissingGroups {
 		if !group.Exists && !createUserGroup(group.Name, requestConfirmation) {
 			continue

@@ -7,25 +7,25 @@ import (
 	. "github.com/pol-rivero/pkgstate/lib/types"
 )
 
-func Fix(noConfirm bool) {
+func Fix(noConfirm bool, noRemove bool) {
 	config := config.GetConfig()
 	toolList := tools.CreateTools()
 	for _, tool := range toolList {
 		// Fixes from one tool may affect others, so don't gather data in parallel
-		applyFixTool(tool, config, noConfirm)
+		applyFixTool(tool, config, noConfirm, noRemove)
 	}
 }
 
-func applyFixTool(tool tools.Tool, config config.Config, noConfirm bool) {
+func applyFixTool(tool tools.Tool, config config.Config, noConfirm bool, noRemove bool) {
 	err := tool.GatherData(&config)
 	if err != nil {
 		log.Error("Failed to %s (skipping): %v", tool.FriendlyProcessName(), err)
 		return
 	}
 	requestConfirmation := !noConfirm
-	result := tool.ApplyFixes(requestConfirmation)
+	result := tool.ApplyFixes(requestConfirmation, noRemove)
 	if result == ProcessAgain {
 		log.Info("Refreshing '%s' and trying again", tool.FriendlyProcessName())
-		applyFixTool(tool, config, noConfirm)
+		applyFixTool(tool, config, noConfirm, noRemove)
 	}
 }

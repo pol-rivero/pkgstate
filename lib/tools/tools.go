@@ -12,7 +12,7 @@ type Tool interface {
 	FriendlyProcessName() string
 	GatherData(*config.Config) error
 	PrintDiff()
-	ApplyFixes(requestConfirmation bool) ApplyFixesResult
+	ApplyFixes(requestConfirmation bool, noRemove bool) ApplyFixesResult
 	GenerateConfig(*config.Config) error
 	Cleanup(requestConfirmation bool)
 }
