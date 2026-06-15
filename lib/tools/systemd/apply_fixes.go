@@ -44,6 +44,8 @@ func getActionForDesiredState(desiredState SystemdUnitState) (string, error) {
 		return "enable", nil
 	case "disabled":
 		return "disable", nil
+	case "masked":
+		return "mask", nil
 	default:
 		return "", fmt.Errorf("the desired state '%s' cannot be applied automatically", desiredState)
 	}
